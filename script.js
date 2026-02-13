@@ -37,6 +37,11 @@ let introIndex = 0;
 let questionIndex = 0;
 let isIntroSkipped = false;
 let isTransitioning = false;
+let introTimeout = null;
+let noButtonEscapeCount = 0;
+const MAX_NO_ESCAPES = 4;
+const CRY_GIF_URL = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW42dHN2dWlvMGZ2OXAxcmd2enc3a2lqeXcxd3JzOWI2OG92eGc4bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13t22jOjxpkAN2/giphy.gif";
+const ROMANCE_GIF_URL = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXNyY2ZtaDE1em95NXdjcmdtZTQ5b2VvM2QzbDRjYWZ0dGp6ZmY1YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qxkaO3Ryg3Zja/giphy.gif";
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -170,6 +175,7 @@ function setupSceneNavigation() {
         skipBtn.addEventListener('click', () => {
             isIntroSkipped = true;
             isTransitioning = false;
+            if (introTimeout) clearTimeout(introTimeout);
             switchScene(SCENES.QUESTIONS);
         });
     }
@@ -301,7 +307,7 @@ function startCinematicIntro() {
         typewriterEl.style.animation = 'movieIntroZoom 8s ease-out forwards';
         
         // Increased delay to 10 seconds (8s animation + 2s pause)
-        setTimeout(() => {
+        introTimeout = setTimeout(() => {
             introIndex++; 
             showNextIntroStep();
         }, 10000); 
@@ -328,10 +334,16 @@ function setupQuestions() {
                 // Update text for next time we enter questions
                 questionText.textContent = QUESTIONS[questionIndex];
                 resetNoButton();
+                noButtonEscapeCount = 0;
 
-                // Go back to cinematic intro
-                switchScene(SCENES.INTRO);
-                startCinematicIntro();
+                if (isIntroSkipped) {
+                    // If skipped, stay on the questions scene and just update the text
+                    // The text is already updated above
+                } else {
+                    // Go back to cinematic intro
+                    switchScene(SCENES.INTRO);
+                    startCinematicIntro();
+                }
             } else {
                 switchScene(SCENES.MSG3);
                 setupFinalValentineButtons();
@@ -344,34 +356,85 @@ function setupFinalValentineButtons() {
     const yesBtn = document.getElementById('yes-btn');
     const noBtn = document.getElementById('no-btn');
 
-    if (yesBtn) {
+    if (yesBtn && !yesBtn.dataset.listenerAttached) {
         yesBtn.addEventListener('click', () => {
             createExplosion();
             switchScene(SCENES.DATE_PLAN);
         });
+        yesBtn.dataset.listenerAttached = "true";
     }
 
-    if (noBtn) {
-        noBtn.addEventListener('mouseover', () => {
-            const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-            const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
-            noBtn.style.position = 'fixed';
-            noBtn.style.left = `${x}px`;
-            noBtn.style.top = `${y}px`;
-        });
-    }
+    // No button is already handled by setupNoButtonEscape in DOMContentLoaded
 }
 
 function setupNoButtonEscape() {
-    const noBtn = document.querySelector('.btn-no');
-    if (!noBtn) return;
-    noBtn.addEventListener('mouseover', () => {
-        const x = Math.random() * (window.innerWidth - noBtn.offsetWidth);
-        const y = Math.random() * (window.innerHeight - noBtn.offsetHeight);
-        noBtn.style.position = 'fixed';
-        noBtn.style.left = `${x}px`;
-        noBtn.style.top = `${y}px`;
+    const noBtns = document.querySelectorAll('.btn-no');
+    noBtns.forEach(btn => {
+        if (!btn.dataset.listenerAttached) {
+            btn.addEventListener('mouseover', handleNoButtonEscape);
+            btn.addEventListener('click', handleNoButtonEscape);
+            btn.dataset.listenerAttached = "true";
+        }
     });
+}
+
+function handleNoButtonEscape(e) {
+    const btn = e.target;
+    noButtonEscapeCount++;
+
+    if (noButtonEscapeCount >= MAX_NO_ESCAPES) {
+        showCryingGif();
+        return;
+    }
+
+    const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+    const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+    btn.style.position = 'fixed';
+    btn.style.left = `${x}px`;
+    btn.style.top = `${y}px`;
+    btn.style.zIndex = '1000';
+}
+
+function showCryingGif() {
+    // Show an overlay with the crying GIF
+    let overlay = document.getElementById('cry-overlay');
+    if (!overlay) {
+        overlay = document.createElement('div');
+        overlay.id = 'cry-overlay';
+        overlay.style.position = 'fixed';
+        overlay.style.top = '0';
+        overlay.style.left = '0';
+        overlay.style.width = '100%';
+        overlay.style.height = '100%';
+        overlay.style.backgroundColor = 'rgba(0, 0, 0, 0.9)';
+        overlay.style.display = 'flex';
+        overlay.style.flexDirection = 'column';
+        overlay.style.justifyContent = 'center';
+        overlay.style.alignItems = 'center';
+        overlay.style.zIndex = '1000000';
+        overlay.style.opacity = '0';
+        overlay.style.transition = 'opacity 0.5s ease';
+        
+        overlay.innerHTML = `
+            <img src="${CRY_GIF_URL}" alt="Crying" style="max-width: 300px; border-radius: 15px; box-shadow: 0 0 30px rgba(255, 255, 255, 0.2);">
+            <h2 style="color: white; font-family: 'Playfair Display', serif; margin-top: 20px; text-align: center; font-size: 1.5rem;">Why no? 🥺</h2>
+            <button id="retry-no-btn" class="royal-btn-welcome" style="margin-top: 20px; padding: 10px 25px; font-size: 0.9rem;">I'm sorry, let me try again 🤍</button>
+        `;
+        document.body.appendChild(overlay);
+        
+        // Force reflow for transition
+        void overlay.offsetWidth;
+        overlay.style.opacity = '1';
+        
+        document.getElementById('retry-no-btn').addEventListener('click', () => {
+            overlay.style.opacity = '0';
+            setTimeout(() => {
+                overlay.remove();
+                noButtonEscapeCount = 0;
+                resetNoButton();
+            }, 500);
+        });
+    }
 }
 
 function resetNoButton() {
@@ -402,24 +465,29 @@ function handleSuccess(date, activity) {
     createExplosion();
     switchScene(SCENES.RESULT);
 
+    const romanceContainer = document.getElementById('romance-gif-container');
+    if (romanceContainer) {
+        romanceContainer.innerHTML = `<img src="${ROMANCE_GIF_URL}" alt="Romance" style="max-width: 250px; border-radius: 15px; margin: 20px 0; box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);">`;
+    }
+
     const waLinkContainer = document.getElementById('wa-link-container');
-    const message = encodeURIComponent(`Yes! I've thought about it deeply, and I'm 100% sure. I'd love to go on a date with you on ${date} for ${activity}! 🤍💍`);
+    const message = encodeURIComponent(`Yes! I've thought about it deeply. My heart is 100% sure. I'd love to go on our special date on ${date} for ${activity}! Forever yours, Pakeeza (Pearl) 🤍💍`);
     const waNumber = "923128881099";
     
     waLinkContainer.innerHTML = `
         <div class="commitment-card">
-            <h3 class="commitment-title">A Promise of Sincerity</h3>
+            <h3 class="commitment-title">A Promise to My Pearl</h3>
             <p class="commitment-text">
-                "Before we take this step, I ask for your absolute truth. 
+                "Pakeeza, you are the most precious pearl in the ocean of my life. 
+                Before we take this step, I ask for your absolute truth. 
                 Only reach out if your 'Yes' is as certain as the stars. 
-                If your heart isn't 100% ready, I cherish our peace 
-                more than a promise built on shadows."
+                I cherish your peace more than a promise built on shadows."
             </p>
             <a href="https://wa.me/${waNumber}?text=${message}" target="_blank" class="wa-confirm-btn">
-                I am 100% Ready 💬
+                I am 100% Ready, My Love 💬
             </a>
             <div class="commitment-footer">
-                If you aren't ready to commit, your silence is respected.
+                My Dearest Pakeeza, your happiness is my only promise.
             </div>
         </div>
     `;

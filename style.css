@@ -9,8 +9,9 @@ body {
     background-color: #000;
     color: #fff;
     font-family: 'Montserrat', sans-serif;
-    overflow: hidden;
-    height: 100vh;
+    overflow-x: hidden;
+    overflow-y: auto;
+    min-height: 100vh;
     width: 100vw;
     -webkit-font-smoothing: antialiased;
 }
@@ -99,7 +100,7 @@ h1, h2, h3 {
     top: 0;
     left: 0;
     width: 100%;
-    height: 100%;
+    min-height: 100vh;
     display: flex;
     flex-direction: column;
     justify-content: center;
@@ -107,14 +108,21 @@ h1, h2, h3 {
     opacity: 0;
     visibility: hidden;
     transition: opacity 1.5s cubic-bezier(0.4, 0, 0.2, 1), visibility 1.5s;
-    padding: 40px;
+    padding: 60px 20px;
     text-align: center;
+    overflow-y: visible;
 }
 
 .active-scene {
     opacity: 1;
     visibility: visible;
     z-index: 10;
+}
+
+/* Ensure flex children don't get cut at the top if content is larger than viewport */
+.scene > div {
+    margin-top: auto;
+    margin-bottom: auto;
 }
 
 .hidden-scene {
@@ -416,20 +424,20 @@ h1, h2, h3 {
 
 /* --- Success Scene --- */
 .celebration-title {
-    font-size: clamp(3rem, 10vw, 6rem);
-    letter-spacing: 20px;
+    font-size: clamp(2.2rem, 8vw, 4.5rem);
+    letter-spacing: 12px;
     color: #ffd700;
     text-transform: uppercase;
-    margin-bottom: 20px;
+    margin-bottom: 10px;
     text-shadow: 0 0 40px rgba(255, 215, 0, 0.5);
 }
 
 .celebration-subtitle {
-    font-size: 1.2rem;
-    letter-spacing: 4px;
+    font-size: 1.1rem;
+    letter-spacing: 3px;
     text-transform: uppercase;
     color: rgba(255, 255, 255, 0.7);
-    margin-bottom: 50px;
+    margin-bottom: 30px;
 }
 
 /* --- Mobile Responsiveness --- */
@@ -508,9 +516,9 @@ h1, h2, h3 {
     background: transparent;
     border: 1px solid rgba(255, 215, 0, 0.2);
     border-radius: 2px;
-    padding: 40px;
-    max-width: 550px;
-    margin: 30px auto;
+    padding: 30px;
+    max-width: 500px;
+    margin: 20px auto;
     box-shadow: 0 10px 30px rgba(0, 0, 0, 0.5);
     animation: cardFadeIn 1.5s ease-out;
 }
