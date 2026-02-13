@@ -298,13 +298,13 @@ function startCinematicIntro() {
         typewriterEl.textContent = text; 
         typewriterEl.style.animation = 'none';
         void typewriterEl.offsetWidth; 
-        typewriterEl.style.animation = 'movieIntroZoom 5.5s ease-out forwards';
+        typewriterEl.style.animation = 'movieIntroZoom 8s ease-out forwards';
         
-        // We increment AFTER setting the timeout for the next step
+        // Increased delay to 10 seconds (8s animation + 2s pause)
         setTimeout(() => {
-            introIndex++; // THIS IS THE ONLY INCREMENT FOR REGULAR TEXTS
+            introIndex++; 
             showNextIntroStep();
-        }, 6000); 
+        }, 10000); 
     }
 
     showNextIntroStep();
@@ -441,15 +441,18 @@ function initStarlightTrail() {
 
 function initFallingRoses() {
     setInterval(() => {
-        if (document.hidden) return; // Don't run when tab is inactive
+        if (document.hidden) return; 
         const rose = document.createElement('div');
         rose.className = 'falling-rose';
         rose.innerHTML = '🤍';
         rose.style.left = Math.random() * 100 + 'vw';
-        rose.style.animationDuration = (Math.random() * 3 + 5) + 's';
+        const duration = (Math.random() * 3 + 5);
+        rose.style.animationDuration = duration + 's';
         document.body.appendChild(rose);
-        setTimeout(() => rose.remove(), 6000);
-    }, 1200); // Slower rate (1.2s instead of 0.6s)
+        
+        // Remove after animation completes (duration + 1s buffer)
+        setTimeout(() => rose.remove(), (duration + 1) * 1000);
+    }, 1200); 
 }
 
 function createExplosion() {
