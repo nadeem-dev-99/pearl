@@ -1,0 +1,81 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>ASCII Portrait Viewer</title>
+    <style>
+        body, html {
+            margin: 0;
+            padding: 0;
+            width: 100%;
+            height: 100%;
+            background-color: #000;
+            color: #fff;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            overflow: hidden;
+            font-family: 'Courier New', monospace;
+        }
+
+        #viewer-container {
+            width: 100vw;
+            height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: #000;
+            overflow: hidden;
+            position: relative;
+        }
+
+        /* Perfectly centered scaling */
+        #ascii-content {
+            font-family: 'Courier New', monospace;
+            font-size: 0.25vh;
+            line-height: 1.0;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            transform: scale(2.8) scaleX(0.8);
+            transform-origin: center center; /* Absolute center scaling */
+            filter: brightness(1.1) contrast(1.1);
+            text-shadow: 0 0 2px rgba(255, 215, 0, 0.2);
+            -webkit-font-smoothing: antialiased;
+            white-space: pre;
+            margin: 0;
+            padding: 0;
+        }
+
+        .text-portrait-container {
+            display: block;
+            margin: 0;
+            padding: 0;
+        }
+    </style>
+</head>
+<body>
+    <div id="viewer-container">
+        <div id="ascii-content">Loading Portrait...</div>
+    </div>
+
+    <script src="portrait_data.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const container = document.getElementById('ascii-content');
+            // Try both possible variable names for safety
+            const content = window.PORTRAIT_ASCII || window.portraitData;
+            
+            if (content) {
+                container.innerHTML = content;
+                console.log("ASCII Portrait loaded successfully.");
+            } else {
+                container.innerHTML = "Error: Portrait data not found. Please ensure portrait_data.js is correct.";
+                container.style.fontSize = "20px";
+                console.error("Portrait data not found in window.PORTRAIT_ASCII or window.portraitData");
+            }
+        });
+    </script>
+</body>
+</html>
