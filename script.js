@@ -41,7 +41,7 @@ let introTimeout = null;
 let noButtonEscapeCount = 0;
 const MAX_NO_ESCAPES = 4;
 const CRY_GIF_URL = "https://media2.giphy.com/media/v1.Y2lkPTc5MGI3NjExYW42dHN2dWlvMGZ2OXAxcmd2enc3a2lqeXcxd3JzOWI2OG92eGc4bCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/13t22jOjxpkAN2/giphy.gif";
-const ROMANCE_GIF_URL = "https://media4.giphy.com/media/v1.Y2lkPTc5MGI3NjExcXNyY2ZtaDE1em95NXdjcmdtZTQ5b2VvM2QzbDRjYWZ0dGp6ZmY1YiZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/qxkaO3Ryg3Zja/giphy.gif";
+const ROMANCE_VIDEO_URL = "https://media4.giphy.com/media/qxkaO3Ryg3Zja/giphy.mp4";
 
 // --- Initialization ---
 document.addEventListener('DOMContentLoaded', () => {
@@ -61,9 +61,6 @@ document.addEventListener('DOMContentLoaded', () => {
         const container = document.getElementById('ascii-fullscreen-content');
         if (container && portraitContent) {
             container.innerHTML = portraitContent;
-            console.log("Pre-injected ASCII into fullscreen container");
-        } else {
-            console.warn("ASCII content not ready for pre-injection");
         }
     }, 500); // Increased delay to ensure data is loaded
 });
@@ -101,18 +98,10 @@ function injectPortrait() {
     // Inject ASCII if portraitData or PORTRAIT_ASCII is available
     const portraitContent = window.PORTRAIT_ASCII || window.portraitData;
     
-    console.log("Checking for portrait data...", {
-        hasPortraitData: !!window.portraitData,
-        hasPortraitAscii: !!window.PORTRAIT_ASCII,
-        portraitContentLength: portraitContent ? portraitContent.length : 0
-    });
-    
     if (portraitContent) {
-        console.log("Portrait data found, injecting...");
         const asciiContainer = document.getElementById('ascii-fullscreen-content');
         if (asciiContainer) {
             asciiContainer.innerHTML = portraitContent;
-            console.log("ASCII injected into fullscreen container");
         }
         
         const portraitBox = document.getElementById('portrait-container');
@@ -135,10 +124,8 @@ function injectPortrait() {
                 inner.style.filter = 'brightness(1.3) contrast(1.2) drop-shadow(0 0 15px rgba(255, 215, 0, 0.3))';
                 inner.style.display = 'inline-block';
             }
-            console.log("ASCII injected into final message box");
         }
     } else {
-        console.error("portraitData or PORTRAIT_ASCII not found! Retrying...");
         // Retry a few times if not found
         if (!window.injectionRetries) window.injectionRetries = 0;
         if (window.injectionRetries < 30) {
@@ -157,7 +144,7 @@ function setupSceneNavigation() {
             const video = document.getElementById('bg-video');
             const overlay = document.getElementById('video-overlay');
             if (video && video.paused) {
-                video.play().catch(err => console.log("Autoplay blocked:", err));
+                video.play().catch(() => {});
                 if (overlay) {
                     overlay.classList.remove('paused');
                     overlay.classList.add('playing');
@@ -182,8 +169,6 @@ function setupSceneNavigation() {
 }
 
 function switchScene(sceneId) {
-    console.log(`Switching to scene: ${sceneId}`);
-    
     // 1. Handle regular scenes
     document.querySelectorAll('.scene').forEach(el => {
         if (el.id !== SCENES.ASCII_FULL) {
@@ -196,9 +181,14 @@ function switchScene(sceneId) {
     // 2. Handle the target scene
     const target = document.getElementById(sceneId);
     if (target) {
+        // Force scroll to top on every scene switch
+        window.scrollTo(0, 0);
+        document.body.scrollTop = 0;
+        document.documentElement.scrollTop = 0;
+        target.scrollTop = 0;
+
         if (sceneId === SCENES.ASCII_FULL) {
             // ASCII is a special overlay
-            console.log("Applying active-scene to ASCII overlay");
             target.classList.add('active-scene');
             target.classList.remove('hidden-scene');
             target.style.display = 'flex'; 
@@ -252,7 +242,6 @@ function startCinematicIntro() {
         
         // Trigger ASCII reveal ONLY ONCE at the middle of the intro (index 7)
         if (introIndex === 7 && !isIntroSkipped) {
-            console.log("ACTivating Single Cinematic ASCII Reveal!");
             isTransitioning = true;
             
             // 1. Burst into ASCII Scene
@@ -387,12 +376,19 @@ function handleNoButtonEscape(e) {
         return;
     }
 
-    const x = Math.random() * (window.innerWidth - btn.offsetWidth);
-    const y = Math.random() * (window.innerHeight - btn.offsetHeight);
-    btn.style.position = 'fixed';
-    btn.style.left = `${x}px`;
-    btn.style.top = `${y}px`;
-    btn.style.zIndex = '1000';
+    // Add a dodge animation before jumping
+    btn.style.animation = 'none';
+    void btn.offsetWidth;
+    btn.style.animation = 'btnDodge 0.4s ease-out';
+
+    setTimeout(() => {
+        const x = Math.random() * (window.innerWidth - btn.offsetWidth);
+        const y = Math.random() * (window.innerHeight - btn.offsetHeight);
+        btn.style.position = 'fixed';
+        btn.style.left = `${x}px`;
+        btn.style.top = `${y}px`;
+        btn.style.zIndex = '1000';
+    }, 150);
 }
 
 function showCryingGif() {
@@ -467,7 +463,17 @@ function handleSuccess(date, activity) {
 
     const romanceContainer = document.getElementById('romance-gif-container');
     if (romanceContainer) {
-        romanceContainer.innerHTML = `<img src="${ROMANCE_GIF_URL}" alt="Romance" style="max-width: 250px; border-radius: 15px; margin: 20px 0; box-shadow: 0 0 25px rgba(255, 255, 255, 0.3);">`;
+        romanceContainer.innerHTML = `
+            <div class="polaroid-frame">
+                <video id="romance-video" autoplay loop muted playsinline style="width: 100%; border-radius: 8px;">
+                    <source src="${ROMANCE_VIDEO_URL}" type="video/mp4">
+                </video>
+            </div>
+        `;
+        const video = document.getElementById('romance-video');
+        if (video) {
+            video.playbackRate = 0.6; // Reduced speed for romantic feel
+        }
     }
 
     const waLinkContainer = document.getElementById('wa-link-container');
@@ -516,61 +522,92 @@ function initFallingRoses() {
         rose.style.left = Math.random() * 100 + 'vw';
         const duration = (Math.random() * 3 + 5);
         rose.style.animationDuration = duration + 's';
+        rose.style.fontSize = (Math.random() * 10 + 10) + 'px';
+        rose.style.opacity = Math.random() * 0.5 + 0.3;
         document.body.appendChild(rose);
-        
-        // Remove after animation completes (duration + 1s buffer)
-        setTimeout(() => rose.remove(), (duration + 1) * 1000);
-    }, 1200); 
+        setTimeout(() => rose.remove(), duration * 1000);
+    }, 600);
 }
 
 function createExplosion() {
-    const colors = ['#ffd700', '#ffffff', '#ffeb3b', '#ffc107']; // Fewer colors
     const container = document.body;
-    
-    // Create fewer explosion points
-    for (let e = 0; e < 2; e++) { 
-        const originX = 20 + Math.random() * 60;
-        const originY = 30 + Math.random() * 40;
+    const colors = ['#ffd700', '#ffffff', '#ffeb3b', '#ffc107'];
+    const emojis = ['🤍', '🌹', '✨'];
 
-        for (let i = 0; i < 40; i++) { // Reduced from 80 to 40 particles
-            const particle = document.createElement('div');
-            particle.className = 'firework-particle';
-            particle.style.position = 'fixed';
-            particle.style.left = originX + '%';
-            particle.style.top = originY + '%';
-            particle.style.width = Math.random() * 4 + 2 + 'px';
-            particle.style.height = particle.style.width;
-            particle.style.backgroundColor = colors[Math.floor(Math.random() * colors.length)];
-            particle.style.borderRadius = '50%';
-            particle.style.zIndex = '2000000'; // Higher than ASCII overlay
-            particle.style.pointerEvents = 'none';
-            container.appendChild(particle);
+    // 1. Create Cinematic Pixel Fireworks
+    for (let e = 0; e < 3; e++) { 
+        setTimeout(() => {
+            const originX = 20 + Math.random() * 60;
+            const originY = 30 + Math.random() * 40;
 
-            const angle = Math.random() * Math.PI * 2;
-            const velocity = 4 + Math.random() * 8; 
-            const dx = Math.cos(angle) * velocity;
-            const dy = Math.sin(angle) * velocity;
-
-            let x = 0; 
-            let y = 0;
-            let opacity = 1;
-            
-            const animate = () => {
-                x += dx; 
-                y += dy; 
-                y += 0.25; // Gravity
-                opacity -= 0.015; // Faster fade for performance
+            for (let i = 0; i < 40; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'firework-particle';
+                const color = colors[Math.floor(Math.random() * colors.length)];
+                particle.style.backgroundColor = color;
+                particle.style.boxShadow = `0 0 10px ${color}`;
                 
-                particle.style.transform = `translate(${x}px, ${y}px)`;
-                particle.style.opacity = opacity;
+                const angle = Math.random() * Math.PI * 2;
+                const velocity = 5 + Math.random() * 10;
+                const vx = Math.cos(angle) * velocity;
+                const vy = Math.sin(angle) * velocity;
                 
-                if (opacity > 0) {
-                    requestAnimationFrame(animate);
-                } else {
-                    particle.remove();
-                }
-            };
-            requestAnimationFrame(animate);
-        }
+                particle.style.left = originX + 'vw';
+                particle.style.top = originY + 'vh';
+                
+                container.appendChild(particle);
+                
+                let posX = 0;
+                let posY = 0;
+                let curVx = vx;
+                let curVy = vy;
+                
+                const animate = () => {
+                    posX += curVx;
+                    posY += curVy;
+                    curVy += 0.2; // Gravity
+                    curVx *= 0.98;
+                    curVy *= 0.98;
+                    
+                    particle.style.transform = `translate(${posX}px, ${posY}px)`;
+                    
+                    if (parseFloat(particle.style.opacity) <= 0) {
+                        particle.remove();
+                    } else {
+                        particle.style.opacity = (parseFloat(particle.style.opacity) || 1) - 0.02;
+                        requestAnimationFrame(animate);
+                    }
+                };
+                requestAnimationFrame(animate);
+            }
+        }, e * 500);
+    }
+
+    // 2. Create Rose & Heart Emoji Bursts
+    const centerX = window.innerWidth / 2;
+    const centerY = window.innerHeight / 2;
+
+    for (let burst = 0; burst < 3; burst++) {
+        setTimeout(() => {
+            for (let i = 0; i < 15; i++) {
+                const particle = document.createElement('div');
+                particle.className = 'rose-particle';
+                particle.innerHTML = emojis[Math.floor(Math.random() * emojis.length)];
+                
+                const angle = (i / 15) * Math.PI * 2 + (Math.random() * 0.5);
+                const distance = 100 + Math.random() * 150;
+                const tx = Math.cos(angle) * distance;
+                const ty = Math.sin(angle) * distance;
+                
+                particle.style.setProperty('--tx', `${tx}px`);
+                particle.style.setProperty('--ty', `${ty}px`);
+                
+                particle.style.left = (centerX + (Math.random() * 40 - 20)) + 'px';
+                particle.style.top = (centerY + (Math.random() * 40 - 20)) + 'px';
+                
+                container.appendChild(particle);
+                setTimeout(() => particle.remove(), 2500);
+            }
+        }, burst * 600);
     }
 }

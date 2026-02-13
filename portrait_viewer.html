@@ -69,11 +69,9 @@
             
             if (content) {
                 container.innerHTML = content;
-                console.log("ASCII Portrait loaded successfully.");
             } else {
                 container.innerHTML = "Error: Portrait data not found. Please ensure portrait_data.js is correct.";
                 container.style.fontSize = "20px";
-                console.error("Portrait data not found in window.PORTRAIT_ASCII or window.portraitData");
             }
         });
     </script>
