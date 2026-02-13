@@ -815,9 +815,11 @@ h1, h2, h3 {
 .falling-rose {
     position: fixed;
     top: -30px;
-    z-index: 1000;
+    z-index: 5; /* Behind text (which has z-index 10 or 2000) */
     pointer-events: none;
     font-size: 1.2rem;
+    color: #808080; /* Gray color */
+    opacity: 0.3 !important; /* Transparent */
     animation-name: fall;
     animation-timing-function: linear;
     animation-fill-mode: forwards;
@@ -857,6 +859,15 @@ h1, h2, h3 {
 }
 
 /* --- Rose Fireworks --- */
+.firework-particle {
+    position: fixed;
+    width: 4px;
+    height: 4px;
+    border-radius: 50%;
+    pointer-events: none;
+    z-index: 999999;
+}
+
 .rose-particle {
     position: fixed;
     pointer-events: none;

@@ -569,12 +569,13 @@ function createExplosion() {
                     curVx *= 0.98;
                     curVy *= 0.98;
                     
-                    particle.style.transform = `translate(${posX}px, ${posY}px)`;
+                    particle.style.transform = `translate3d(${posX}px, ${posY}px, 0)`; // translate3d for mobile performance
                     
-                    if (parseFloat(particle.style.opacity) <= 0) {
+                    const currentOpacity = parseFloat(particle.style.opacity) || 1;
+                    if (currentOpacity <= 0) {
                         particle.remove();
                     } else {
-                        particle.style.opacity = (parseFloat(particle.style.opacity) || 1) - 0.02;
+                        particle.style.opacity = currentOpacity - 0.02;
                         requestAnimationFrame(animate);
                     }
                 };
