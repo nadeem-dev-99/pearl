@@ -1,4 +1,8 @@
 /* --- Sliding Text (Ticker) --- */
+#skip-intro-btn {
+    display: none !important;
+}
+
 .sliding-text-container {
     width: 100%;
     overflow: hidden;
