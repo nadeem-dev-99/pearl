@@ -1,0 +1,138 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>For Pakeeza ❤️</title>
+    <link href="https://fonts.googleapis.com/css2?family=Cinzel:wght@400;700&family=Playfair+Display:wght@400;700&family=Montserrat:wght@300;400&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+    <!-- Background: Deep Space -->
+    <div id="universe-bg">
+        <div class="stars"></div>
+        <div class="twinkling"></div>
+    </div>
+
+    <!-- Music/Video Player: Top Right Corner -->
+    <div id="music-player-container">
+        <video id="bg-video" loop autoplay>
+            <source src="Lyn-You-Are-My-Destiny.mp4" type="video/mp4">
+        </video>
+        <div id="video-overlay" class="paused">
+            <span class="play-icon">▶</span>
+        </div>
+    </div>
+
+    <!-- Scene 0: Welcome Screen -->
+    <section id="scene-welcome" class="scene active-scene">
+        <div class="welcome-container">
+            <div class="white-rose-glow"></div>
+            <h1 class="welcome-title">For My Dearest Pakeeza</h1>
+            <p class="welcome-subtitle">A journey through my heart, just for you...</p>
+            <button id="start-journey-btn" class="royal-btn-welcome">Begin Journey 🤍</button>
+        </div>
+    </section>
+
+    <!-- Scene: Cinematic Intro (Restored Flow) -->
+    <section id="scene-intro" class="scene hidden-scene">
+        <div class="message-scene-container">
+            <div class="sliding-text-container">
+                <div class="sliding-text">FOR PAKEEZA • MY DEAREST PEARL • ALWAYS IN MY HEART • </div>
+            </div>
+            <div class="intro-text-wrapper">
+                <h1 class="message-text" id="typewriter-intro"></h1>
+                <span class="typewriter-cursor"></span>
+            </div>
+        </div>
+        <button id="skip-intro-btn" class="royal-btn-welcome" style="position: absolute; bottom: 20px; right: 20px; font-size: 0.7rem; opacity: 0.5;">Skip >></button>
+    </section>
+
+    <!-- Scene: Fullscreen ASCII -->
+    <section id="scene-ascii-fullscreen" class="scene hidden-scene">
+        <div class="ascii-fullscreen-container">
+            <div id="ascii-fullscreen-content"></div>
+        </div>
+    </section>
+
+    <!-- Scene: Questions -->
+    <section id="scene-questions" class="scene hidden-scene">
+        <div class="sliding-text-container">
+            <div class="sliding-text">FOR PAKEEZA • MY DEAREST PEARL • ALWAYS IN MY HEART • FOR PAKEEZA • MY DEAREST PEARL • ALWAYS IN MY HEART</div>
+        </div>
+        <div class="message-scene-container">
+            <h1 id="dynamic-question" class="royal-question" style="font-family: 'Cinzel', serif;">Do you believe some moments are best shared in peace and silence?</h1>
+            <div class="royal-buttons">
+                <button class="btn-royal question-ans-btn btn-yes" data-ans="yes">Yes, I do 🤍</button>
+                <button class="btn-royal question-ans-btn btn-no" data-ans="no">No</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene: Final Valentine Question -->
+    <section id="scene-msg-3" class="scene hidden-scene">
+        <div class="message-scene-container">
+            <p class="poetic-text" style="color: rgba(255, 255, 255, 0.9); font-size: 1.2rem; line-height: 1.8; margin-bottom: 30px;"> 
+                The universe gave me its best gift on <b>Feb 18th</b>.<br> 
+                But today, on <b>Feb 14th</b>, I want to ask for your heart... 
+            </p> 
+
+            <h1 class="royal-question" style="font-family: 'Cinzel', serif; font-size: 2.5rem; margin-bottom: 40px;">Will you be my Valentine? 🤍</h1> 
+
+            <div id="portrait-container"></div> 
+
+            <div class="royal-buttons"> 
+                <button id="yes-btn" class="btn-royal btn-yes">Yes, I will! ❤️</button> 
+                <button id="no-btn" class="btn-royal btn-no">No</button> 
+            </div> 
+        </div>
+    </section>
+
+    <!-- Scene: Date Planning -->
+    <section id="scene-date-plan" class="scene hidden-scene">
+        <div class="date-planning-container">
+            <div class="date-planning-box">
+                <header class="royal-header">
+                    <img src="https://i.giphy.com/media/v1.Y2lkPTc5MGI3NjExNnhyNXA4Z3R4eHR4eHR4eHR4eHR4eHR4eHR4eHR4eHR4eHR4eH/3o7TKoWXm3okO1kgHC/giphy.gif" alt="White Rose" class="feature-gif">
+                    <h2>Will you go on a date with me?</h2>
+                </header>
+                
+                <div class="date-input-group">
+                    <label>When should we go?</label>
+                    <input type="date" id="date-value" min="2026-02-14">
+                    <p class="error-message" id="error-date">Please pick a date 🤍</p>
+                </div>
+
+                <div class="date-input-group">
+                    <label>If it’s just us, how should we spend our time together?</label>
+                    <select id="date-activity" required>
+                        <option >Select an activity...</option>
+                        <option value="Quiet dinner together">A quiet lunch together</option>
+                        <option value="Uninterrupted time">Uninterrupted time, just us</option>
+                        <option value="Cozy day">A cozy day to relax and talk</option>
+                        <option value="Meaningful moments">Creating meaningful moments together</option>
+
+                    </select>
+                    <p class="error-message" id="error-activity">Please choose an activity 🤍</p>
+                </div>
+
+                <button id="final-submit-btn" class="royal-btn-welcome">Share My Response 🤍</button>
+            </div>
+        </div>
+    </section>
+
+    <!-- Scene: Final Success -->
+    <section id="scene-result" class="scene hidden-scene">
+        <div class="celebration-container">
+            <h1 class="celebration-title">It's a Date! 💍</h1>
+            <p class="celebration-subtitle">My heart is dancing. I can't wait to see you.</p>
+            <div id="wa-link-container"></div>
+            <p class="final-promise">I promise to make it special. Just for you. 🤍</p>
+        </div>
+    </section>
+
+    <script src="portrait_data.js" defer></script>
+    <script src="script.js" defer></script>
+</body>
+</html>
